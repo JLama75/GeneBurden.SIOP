@@ -106,11 +106,14 @@ gcc2 <- gcc[!is.na(gcc$p) & gcc$p <= 1E-05, ]
 out=paste0(outDir, "/", trait, ".tsv")
 out2=paste0(outDir, "/", trait, ".xlsx")
 out3=paste0(outDir2, "/", trait, ".tsv")
+out4=paste0(outDir, "/", trait, "P1E05.tsv")
 
 print(paste0("save the file in: ",out))
 print(paste0("Also save the file in: ",out3))
 print(paste0("save the file as excel in: ",out2))
+print(paste0("save the top genes P<1E-05file as tsv in: ",out4))
 
 write.table(gcc, out, quote = F, row.names=F)
 write.table(gcc, out3, quote = F, row.names=F)
 write_xlsx(gcc, path = out2)
+write.table(gcc2, out4, quote = F, row.names=F)
