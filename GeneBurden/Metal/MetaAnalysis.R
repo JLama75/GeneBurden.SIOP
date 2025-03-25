@@ -47,10 +47,10 @@ cat("outDir:", outDir, "\n")
 fame <- read.delim(file1)
 mee <- read.delim(file2)
 
-fame = fame %>% select(GENE, BETA, SE, P)
-colnames(fame) <- c("GENE", "fame.Beta", "fame.SE", "fame.P")
-mee = mee %>% select(GENE, BETA, SE, P)
-colnames(mee) <- c("GENE", "mee.Beta", "mee.SE", "mee.P")
+fame = fame %>% select(GENE, BETA, SE, P, N)
+colnames(fame) <- c("GENE", "fame.Beta", "fame.SE", "fame.P", "fame.N")
+mee = mee %>% select(GENE, BETA, SE, P, N)
+colnames(mee) <- c("GENE", "mee.Beta", "mee.SE", "mee.P", "mee.N")
 
 gcc <- merge(fame, mee, by="GENE")
 print(paste0("no. of common genes ", trait))
@@ -61,12 +61,12 @@ print(dim(gcc)[1])
 gcc$I2 <- gcc$ci.upper <- gcc$ci.lower <- gcc$p <- gcc$se <- gcc$beta <- rep(NA, nrow(gcc))
 
 for (i in 1:nrow(gcc)) {
-  temp1 <- gcc[i, 2:4]  # Assuming these are beta, se, p for one set of studies
-  temp2 <- gcc[i, 5:7]  # Assuming these are beta, se, p for another set of studies
+  temp1 <- gcc[i, 2:5]  # Assuming these are beta, se, p for one set of studies
+  temp2 <- gcc[i, 6:9]  # Assuming these are beta, se, p for another set of studies
   
   # Rename columns for both temp1 and temp2
-  colnames(temp1) <- c("beta", "se", "p")
-  colnames(temp2) <- c("beta", "se", "p")
+  colnames(temp1) <- c("beta", "se", "p", "n")
+  colnames(temp2) <- c("beta", "se", "p", "n")
   
   # Combine both sets of studies into one DataFrame
   temp <- rbind(temp1, temp2)
@@ -99,6 +99,9 @@ gcc$log10P <- -log10(gcc$p)
 gcc <- gcc %>% arrange(desc(log10P))
 gcc$BH <- p.adjust(gcc$p, method = "BH")
 gcc$BonferroniCutoff <- 0.05/(dim(gcc)[1])
+
+gcc$trait <- trait
+gcc2 <- gcc[!is.na(gcc$p) & gcc$p <= 1E-05, ]
 
 out=paste0(outDir, "/", trait, ".tsv")
 out2=paste0(outDir, "/", trait, ".xlsx")
